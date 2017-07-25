@@ -28,16 +28,17 @@ passport.use(new BasicStrategy((user, pass, done) => {
 
 const app = express();
 app.use(helmet());
-app.use(passport.authenticate('basic', { session: false }));
 app.use(bodyParser.json());
 
-app.get('/payee', getAll(db, 'PAYEE_V1'));
-app.get('/payee/:PAYEENAME', getOneBy(db, 'PAYEE_V1', 'PAYEENAME'));
-app.post('/payee', insert(db, dbx, 'PAYEE_V1'));
+const mb = passport.authenticate('basic', { session: false });
 
-app.get('/transaction', getAll(db, 'CHECKINGACCOUNT_V1'));
-app.get('/transaction/:TRANSID', getOneBy(db, 'CHECKINGACCOUNT_V1', 'TRANSID'));
-app.post('/transaction', insert(db, dbx, 'CHECKINGACCOUNT_V1'));
+app.get('/payee', mb, getAll(db, 'PAYEE_V1'));
+app.get('/payee/:PAYEENAME', mb, getOneBy(db, 'PAYEE_V1', 'PAYEENAME'));
+app.post('/payee', mb, insert(db, dbx, 'PAYEE_V1'));
+
+app.get('/transaction', mb, getAll(db, 'CHECKINGACCOUNT_V1'));
+app.get('/transaction/:TRANSID', mb, getOneBy(db, 'CHECKINGACCOUNT_V1', 'TRANSID'));
+app.post('/transaction', mb, insert(db, dbx, 'CHECKINGACCOUNT_V1'));
 
 // https stuff
 const lex = require('letsencrypt-express').create({
