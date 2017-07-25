@@ -18,7 +18,7 @@ tar xf ${NAME}.tar
 docker build -t ${NAME} .
 docker stop ${NAME}
 docker rm ${NAME}
-docker run --name ${NAME} --restart unless-stopped -v \"\${PWD}\":/usr/src/app -w /usr/src/app -p ${PORT}:${PORT} -e SHA=${SHA} -e DATE=\"${DATE}\" ${ENV_VARS} -d ${NAME}
+docker run --name ${NAME} --restart unless-stopped -v \"\${PWD}\":/usr/src/app -w /usr/src/app -p 80:80 -p 443:443 -e SHA=${SHA} -e DATE=\"${DATE}\" ${ENV_VARS} -d ${NAME}
 '"
 
 echo "Done."
