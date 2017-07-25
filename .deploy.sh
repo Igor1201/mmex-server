@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 SHA=`git log -1 --abbrev=7 --format="%h"`
 DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 NAME="mmex-server"
