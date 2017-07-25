@@ -41,7 +41,7 @@ app.post('/transaction', insert(db, dbx, 'CHECKINGACCOUNT_V1'));
 
 // https stuff
 const lex = require('letsencrypt-express').create({
-  server: 'https://acme-staging.api.letsencrypt.org/directory',
+  server: 'https://acme-v01.api.letsencrypt.org/directory',
   approveDomains: ['vm.borges.me']
 });
 
