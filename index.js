@@ -4,6 +4,8 @@ const dblite = require('dblite');
 const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const passport = require('passport');
+const BasicStrategy = require('passport-http').BasicStrategy;
 const { getAll, getOneBy, insert } = require('./db-helpers');
 
 const dbx = new Dropbox({ accessToken: process.env.DROPBOX_ACCESS_KEY });
@@ -19,8 +21,14 @@ const db = {
   },
 };
 
+passport.use(new BasicStrategy((user, pass, done) => {
+  if (user === process.env.USER && pass === process.env.PASSWORD) return done(null, user);
+  return done(null, false);
+}));
+
 const app = express();
 app.use(helmet());
+app.use(passport.authenticate('basic', { session: false }));
 app.use(bodyParser.json());
 
 app.get('/payee', getAll(db, 'PAYEE_V1'));
