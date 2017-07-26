@@ -43,6 +43,8 @@ app.post('/transaction', mb, insert(db, dbx, 'CHECKINGACCOUNT_V1'));
 // https stuff
 const lex = require('letsencrypt-express').create({
   server: 'https://acme-v01.api.letsencrypt.org/directory',
+  agreeTos: true,
+  email: 'igor@borges.me',
   approveDomains: ['vm.borges.me']
 });
 
