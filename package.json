@@ -37,7 +37,8 @@
     "lodash": "^4.17.4",
     "mz": "^2.6.0",
     "passport": "^0.3.2",
-    "passport-http": "^0.3.0"
+    "passport-http": "^0.3.0",
+    "thenify-all": "^1.6.0"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

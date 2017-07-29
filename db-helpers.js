@@ -1,62 +1,49 @@
 const __ = require('lodash');
-const fs = require('mz/fs');
 
-const getAll = (db, table) => {
-  return (req, res) => {
-    db.get().query(`SELECT * FROM ${table}`, (err, items) => {
-      if (err) {
-        res.status(500);
-        return res.send({ error: err.stack });
-      }
-
-      return res.send(JSON.stringify(items));
-    });
+const throwError = (res) => {
+  return (err) => {
+    res.status(500);
+    return res.send({ error: err.stack });
   };
 };
 
-const getOneBy = (db, table, column) => {
+const getAll = (file, table) => {
   return (req, res) => {
-    db.get().query(`SELECT * FROM ${table} WHERE ${column} = :value`, { value: req.params[column] }, (err, items) => {
-      if (err) {
-        res.status(500);
-        return res.send({ error: err.stack });
-      }
-
-      res.status(items && items[0] ? 200 : 404);
-      return res.send(items[0]);
-    })
+    return file.download()
+      .then(() => file.getDb())
+      .then((db) => db.query(`SELECT * FROM ${table}`))
+      .then((items) => res.send(JSON.stringify(items)))
+      .catch(throwError(res));
   };
 };
 
-const commitAndUpload = (db, dbx) => {
-  return fs.readFile(db.getFileName())
-    .then((contents) => {
-      return dbx.filesUpload({ path: process.env.DROPBOX_FILE_PATH, contents: contents, mode: 'overwrite' });
-    });
+const getOneBy = (file, table, column) => {
+  return (req, res) => {
+    return file.download()
+      .then(() => file.getDb())
+      .then((db) => db.query(`SELECT * FROM ${table} WHERE ${column} = :value`, { value: req.params[column] }))
+      .then((items) => {
+        res.status(items && items[0] ? 200 : 404);
+        return res.send(items[0]);
+      })
+      .catch(throwError(res));
+  };
 };
 
-const insert = (db, dbx, table) => {
+const insert = (file, table) => {
   return (req, res) => {
     const keys = __.keys(req.body);
     const query = `INSERT INTO ${table} (${__.join(keys, ', ')}) VALUES (:${__.join(keys, ', :')})`;
 
-    db.get().query(query, req.body, (err) => {
-      if (err) {
-        res.status(500);
-        return res.send({ error: err.stack });
-      }
-
-      db.get().lastRowID(table, (rowId) => {
-        commitAndUpload(db, dbx)
-          .then(() => {
-            return res.send({ rowId });
-          })
-          .catch((err) => {
-            res.status(500);
-            return res.send({ error: err.stack });
-          });
-      });
-    });
+    return file.download()
+      .then(() => file.getDb())
+      .then((db) => db.query(query, req.body))
+      .then(() => file.upload())
+      .then(() => file.getDb())
+      .then((db) => db.lastRowID(table))
+      .then((rowId) => res.send({ rowId }))
+      .then(() => file.close())
+      .catch(throwError(res));
   };
 };
 
