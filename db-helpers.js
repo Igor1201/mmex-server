@@ -1,15 +1,15 @@
 const __ = require('lodash');
 
-const throwError = (res) => {
+const throwError = (res, status) => {
   return (err) => {
-    return res.status(500).json({ error: err.stack });
+    return res.status(status || 500).json({ error: err.message });
   };
 };
 
 const getAll = (file, table) => {
   return (req, res) => {
     return file.download()
-      .then(() => file.getDb())
+      .then(file.getDb)
       .then((db) => db.query(`SELECT * FROM ${table}`))
       .then((items) => res.json(items))
       .catch(throwError(res));
@@ -19,7 +19,7 @@ const getAll = (file, table) => {
 const getOneBy = (file, table, column) => {
   return (req, res) => {
     return file.download()
-      .then(() => file.getDb())
+      .then(file.getDb)
       .then((db) => db.query(`SELECT * FROM ${table} WHERE ${column} = :value`, { value: req.params[column] }))
       .then((items) => {
         return res
@@ -36,15 +36,16 @@ const insert = (file, table) => {
     const query = `INSERT INTO ${table} (${__.join(keys, ', ')}) VALUES (:${__.join(keys, ', :')})`;
 
     return file.download()
-      .then(() => file.getDb())
+      .then(file.getDb)
       .then((db) => db.query(query, req.body))
-      .then(() => file.upload())
-      .then(() => file.getDb())
+		  .catch(throwError(res, 400))
+      .then(file.upload)
+      .then(file.getDb)
       .then((db) => new Promise((resolve) => {
         db.lastRowID(table, (rowId) => resolve(rowId));
       }))
       .then((rowId) => res.json({ rowId }))
-      .then(() => file.getDb())
+      .then(file.getDb)
       .then((db) => db.close())
       .catch(throwError(res));
   };
