@@ -29,6 +29,24 @@ app.post('/transaction', auth, insert(file, 'CHECKINGACCOUNT_V1'));
 app.delete('/transaction/:TRANSID', auth, deleteOneBy(file, 'CHECKINGACCOUNT_V1', 'TRANSID'));
 app.put('/transaction/:TRANSID', auth, updateOneBy(file, 'CHECKINGACCOUNT_V1', 'TRANSID'));
 
+app.get('/category', auth, getAll(file, 'CATEGORY_V1'));
+app.get('/category/:CATEGNAME', auth, getOneBy(file, 'CATEGORY_V1', 'CATEGNAME'));
+app.post('/category', auth, insert(file, 'CATEGORY_V1'));
+app.delete('/category/:CATEGNAME', auth, deleteOneBy(file, 'CATEGORY_V1', 'CATEGNAME'));
+app.put('/category/:CATEGNAME', auth, updateOneBy(file, 'CATEGORY_V1', 'CATEGNAME'));
+
+app.get('/subcategory', auth, getAll(file, 'SUBCATEGORY_V1'));
+app.get('/subcategory/:SUBCATEGNAME', auth, getOneBy(file, 'SUBCATEGORY_V1', 'SUBCATEGNAME'));
+app.post('/subcategory', auth, insert(file, 'SUBCATEGORY_V1'));
+app.delete('/subcategory/:SUBCATEGNAME', auth, deleteOneBy(file, 'SUBCATEGORY_V1', 'SUBCATEGNAME'));
+app.put('/subcategory/:SUBCATEGNAME', auth, updateOneBy(file, 'SUBCATEGORY_V1', 'SUBCATEGNAME'));
+
+app.get('/account', auth, getAll(file, 'ACCOUNTLIST_V1'));
+app.get('/account/:ACCOUNTNAME', auth, getOneBy(file, 'ACCOUNTLIST_V1', 'ACCOUNTNAME'));
+app.post('/account', auth, insert(file, 'ACCOUNTLIST_V1'));
+app.delete('/account/:ACCOUNTNAME', auth, deleteOneBy(file, 'ACCOUNTLIST_V1', 'ACCOUNTNAME'));
+app.put('/account/:ACCOUNTNAME', auth, updateOneBy(file, 'ACCOUNTLIST_V1', 'ACCOUNTNAME'));
+
 // https stuff
 const lex = require('letsencrypt-express').create({
   server: 'https://acme-v01.api.letsencrypt.org/directory',
