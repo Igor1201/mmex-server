@@ -92,4 +92,14 @@ const insert = (file, table) => {
   };
 };
 
-module.exports = { getAll, getOneBy, insert, deleteOneBy, updateOneBy };
+const customQuery = (file, query) => {
+  return (req, res) => {
+    return file.download()
+      .then(file.getDb)
+      .then((db) => db.query(query))
+      .then((items) => res.json(items))
+      .catch(throwError(res));
+  };
+};
+
+module.exports = { getAll, getOneBy, insert, deleteOneBy, updateOneBy, customQuery };

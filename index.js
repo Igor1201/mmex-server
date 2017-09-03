@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
-const { getAll, getOneBy, insert, deleteOneBy, updateOneBy } = require('./db-helpers');
+const { getAll, getOneBy, insert, deleteOneBy, updateOneBy, customQuery } = require('./db-helpers');
 const { file } = require('./file-helpers');
 
 passport.use(new BasicStrategy((user, pass, done) => {
@@ -46,6 +46,8 @@ app.get('/account/:ACCOUNTNAME', auth, getOneBy(file, 'ACCOUNTLIST_V1', 'ACCOUNT
 app.post('/account', auth, insert(file, 'ACCOUNTLIST_V1'));
 app.delete('/account/:ACCOUNTNAME', auth, deleteOneBy(file, 'ACCOUNTLIST_V1', 'ACCOUNTNAME'));
 app.put('/account/:ACCOUNTNAME', auth, updateOneBy(file, 'ACCOUNTLIST_V1', 'ACCOUNTNAME'));
+
+app.get('/custom/categories', auth, customQuery(file, 'SELECT c.CATEGID,c.CATEGNAME,s.SUBCATEGID,s.SUBCATEGNAME FROM CATEGORY_V1 AS c LEFT OUTER JOIN SUBCATEGORY_V1 AS s USING(CATEGID) UNION SELECT CATEGID,CATEGNAME,null,null FROM CATEGORY_V1'));
 
 // https stuff
 const lex = require('letsencrypt-express').create({
