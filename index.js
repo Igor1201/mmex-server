@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
-const { getAll, getOneBy, insert, deleteOneBy } = require('./db-helpers');
+const { getAll, getOneBy, insert, deleteOneBy, updateOneBy } = require('./db-helpers');
 const { file } = require('./file-helpers');
 
 passport.use(new BasicStrategy((user, pass, done) => {
@@ -21,11 +21,13 @@ app.get('/payee', auth, getAll(file, 'PAYEE_V1'));
 app.get('/payee/:PAYEENAME', auth, getOneBy(file, 'PAYEE_V1', 'PAYEENAME'));
 app.post('/payee', auth, insert(file, 'PAYEE_V1'));
 app.delete('/payee/:PAYEENAME', auth, deleteOneBy(file, 'PAYEE_V1', 'PAYEENAME'));
+app.put('/payee/:PAYEENAME', auth, updateOneBy(file, 'PAYEE_V1', 'PAYEENAME'));
 
 app.get('/transaction', auth, getAll(file, 'CHECKINGACCOUNT_V1'));
 app.get('/transaction/:TRANSID', auth, getOneBy(file, 'CHECKINGACCOUNT_V1', 'TRANSID'));
 app.post('/transaction', auth, insert(file, 'CHECKINGACCOUNT_V1'));
 app.delete('/transaction/:TRANSID', auth, deleteOneBy(file, 'CHECKINGACCOUNT_V1', 'TRANSID'));
+app.put('/transaction/:TRANSID', auth, updateOneBy(file, 'CHECKINGACCOUNT_V1', 'TRANSID'));
 
 // https stuff
 const lex = require('letsencrypt-express').create({

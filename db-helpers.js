@@ -49,6 +49,28 @@ const deleteOneBy = (file, table, column) => {
   };
 };
 
+const updateOneBy = (file, table, column) => {
+  return (req, res) => {
+    const keys = __.map(__.keys(req.body), (key) => `${key}=:${key}`);
+    const query = `UPDATE ${table} SET ${__.join(keys, ', ')} WHERE ${column} = :__value`;
+
+    return file.download()
+      .then(file.getDb)
+      .then((db) => db.query(query, __.assign({}, req.body, { __value: req.params[column] })))
+      .then(file.upload)
+      .then(file.getDb)
+      .then((db) => db.query(`SELECT changes() as changes`))
+      .then((items) => {
+        return res
+          .status(items && items[0] && parseInt(items[0]['changes']) >= 1 ? 200 : 404)
+          .json(items[0]);
+      })
+      .then(file.getDb)
+      .then((db) => db.close())
+      .catch(throwError(res));
+  };
+};
+
 const insert = (file, table) => {
   return (req, res) => {
     const keys = __.keys(req.body);
@@ -70,4 +92,4 @@ const insert = (file, table) => {
   };
 };
 
-module.exports = { getAll, getOneBy, insert, deleteOneBy };
+module.exports = { getAll, getOneBy, insert, deleteOneBy, updateOneBy };
