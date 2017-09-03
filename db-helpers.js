@@ -30,6 +30,25 @@ const getOneBy = (file, table, column) => {
   };
 };
 
+const deleteOneBy = (file, table, column) => {
+  return (req, res) => {
+    return file.download()
+      .then(file.getDb)
+      .then((db) => db.query(`DELETE FROM ${table} WHERE ${column} = :value`, { value: req.params[column] }))
+      .then(file.upload)
+      .then(file.getDb)
+      .then((db) => db.query(`SELECT changes() as changes`))
+      .then((items) => {
+        return res
+          .status(items && items[0] && parseInt(items[0]['changes']) >= 1 ? 200 : 404)
+          .json(items[0]);
+      })
+      .then(file.getDb)
+      .then((db) => db.close())
+      .catch(throwError(res));
+  };
+};
+
 const insert = (file, table) => {
   return (req, res) => {
     const keys = __.keys(req.body);
@@ -51,4 +70,4 @@ const insert = (file, table) => {
   };
 };
 
-module.exports = { getAll, getOneBy, insert };
+module.exports = { getAll, getOneBy, insert, deleteOneBy };
