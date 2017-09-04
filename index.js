@@ -15,7 +15,7 @@ passport.use(new BasicStrategy((user, pass, done) => {
 const app = express();
 app.use(helmet());
 app.use(bodyParser.json());
-app.options('*', cors({ allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(cors());
 
 const auth = passport.authenticate('basic', { session: false });
 
