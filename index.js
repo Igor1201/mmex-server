@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const cors = require('cors');
 const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
 const { getAll, getOneBy, insert, deleteOneBy, updateOneBy, customQuery } = require('./db-helpers');
@@ -14,6 +15,7 @@ passport.use(new BasicStrategy((user, pass, done) => {
 const app = express();
 app.use(helmet());
 app.use(bodyParser.json());
+app.options('*', cors({ allowedHeaders: ['Content-Type', 'Authorization'] }));
 
 const auth = passport.authenticate('basic', { session: false });
 
